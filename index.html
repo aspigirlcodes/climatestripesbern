@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Climate Stripes Bern</title>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+		<style type="text/css">
+			body, html {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				overflow:hidden;
+			}	
+			svg {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<svg></svg>
+		<script type="text/javascript">
+		var svg = d3.select("svg")
+		var w = svg.style("width").replace("px", "")
+		var h = svg.style("height").replace("px", "")
+		svg.append("rect").attr("width", w).attr("height", h).style("fill", "#333333")
+		
+		d3.csv("klima.csv").then(data => {
+			//console.log(data)
+			var nested = d3.nest()
+				.key(d => d.Year)
+				.entries(data.map(function(d){
+					return {"Year": d.Year, 
+									"Month": +d.Month, 
+									"Temperature": +d.Temperature,
+									"Precipitation": +d.Precipitation}
+					})
+				)
+			//console.log(nested)
+			var reduced = []
+			nested.forEach(d => {
+				var temp = d.values.reduce((acc, val) => {
+					if (val.Month === 12){
+						var monthDays = d3.timeDay.count(new Date(+val.Year, 11, 01), new Date(+val.Year + 1, 0, 01))
+					}
+					else {
+						var monthDays = d3.timeDay.count(new Date(+val.Year, val.Month - 1, 01), new Date(+val.Year, val.Month, 01))
+
+					}
+					var yearDays = d3.timeDay.count(new Date(+val.Year, 0, 01), new Date(+val.Year + 1, 0, 01))
+					var monthTemp = monthDays * val.Temperature / yearDays
+					return acc + monthTemp
+				}, 0 )
+				var prec = d.values.reduce((acc, val) => acc + val.Precipitation, 0)
+				reduced.push({"Year": d.key,
+											"Temperature": temp,
+											"Precipitation": prec})
+			})
+			//console.log(reduced)
+			var step = w / reduced.length
+			var yScale = d3.scaleLinear().domain([0, d3.max(reduced, d => d.Precipitation)]).range([0, h])
+			//var colorScale = d3.scaleLinear()
+			//	.domain(d3.extent(reduced, d => d.Temperature)).range([1.3,-0.3])
+			var colorScale = d3.scaleSequential([d3.max(reduced, d => d.Temperature)-1, d3.min(reduced, d => d.Temperature)+1] , d3.interpolateRdBu)
+			svg.selectAll("rect.klima")
+				.data(reduced)
+				.enter().append("rect")
+				.attr("class", "klima")
+				.attr("width", step)
+				.attr("height", d => yScale(d.Precipitation))
+				.attr("x", (d,i) => i * step)
+				.attr("y", d => h - yScale(d.Precipitation))
+				.style("fill", d => colorScale(d.Temperature))
+				//.style("fill", d => d3.interpolateRdBu(colorScale(d.Temperature)))
+				.append("title")
+          .text(d => d.Year)
+			svg.append("rect")
+				.attr("y", h - 70)
+				.attr("height", 70)
+				.attr("width", w)
+				.style("opacity", .25)
+				.style("fill", "#ffffff")
+			svg.append("text")
+				.text("Temperature and Percipitation in Bern: 1864 - 2018")
+				.attr("y", h - 10)
+				.attr("x", 10)
+				.attr("font-family", "sans-serif")
+        .attr("font-size", d => {
+					if (w > 1850) return "70px"
+					else if (w > 1350) return "50px"
+					else if (w > 800) return "30px"
+					else if (w > 0) return "15px"
+				})
+				.style("fill", "#333333")
+			
+		})						
+		
+		</script>
+	</body>
+</html>
