@@ -25,6 +25,11 @@
 		var h = svg.style("height").replace("px", "")
 		svg.append("rect").attr("width", w).attr("height", h).style("fill", "#333333")
 		
+		var events = [{"Year": "1987", "Event": "I was born"},
+									{"Year": "2006", "Event": "Exchange Year to Turkey"},
+									{"Year": "2015", "Event": "Started working at 89Grad"},
+									{"Year": "2018", "Event": "Bachelor in Computer Science"}]
+		
 		d3.csv("klima.csv").then(data => {
 			//console.log(data)
 			var nested = d3.nest()
@@ -57,7 +62,6 @@
 											"Precipitation": prec})
 			})
 			//console.log(reduced)
-			console.log(h > w)
 			if (+h > +w){
 				var step = h / reduced.length
 				var yScale = d3.scaleLinear().domain([0, d3.max(reduced, d => d.Precipitation)]).range([0, w])
@@ -76,6 +80,18 @@
 					//.style("fill", d => d3.interpolateRdBu(colorScale(d.Temperature)))
 					.append("title")
 	          .text(d => d.Year)
+				svg.selectAll("circle")
+					.data(events)
+					.enter().append("circle")
+					.attr("cx", d => 50 + Math.random() * (w/2 - 50))
+					.attr("cy", d => step * reduced.findIndex(value => value.Year===d.Year) + step/2)
+					.attr("r", 3 / 4 * step)
+					.style("fill", "#ffffff")
+					.style("opacity", 1)
+					.attr("stroke-width", step/2)
+					.attr("stroke", "#333333")
+					.append("title")
+						.text(d => d.Event)
 				svg.append("rect")
 					.attr("height", h)
 					.attr("width", 45)
@@ -111,11 +127,23 @@
 					//.style("fill", d => d3.interpolateRdBu(colorScale(d.Temperature)))
 					.append("title")
 	          .text(d => d.Year)
+				svg.selectAll("circle")
+					.data(events)
+					.enter().append("circle")
+					.attr("cy", d => h/2 + Math.random() * (h/2 - 80))
+					.attr("cx", d => step * reduced.findIndex(value => value.Year===d.Year) + step/2)
+					.attr("r", 3 / 4 * step)
+					.style("fill", "#ffffff")
+					.style("opacity", 1)
+					.attr("stroke-width", step/2)
+					.attr("stroke", "#333333")
+					.append("title")
+						.text(d => d.Event)
 				svg.append("rect")
 					.attr("y", h - 70)
 					.attr("height", 70)
 					.attr("width", w)
-					.style("opacity", .25)
+					.style("opacity", .4)
 					.style("fill", "#ffffff")
 				svg.append("text")
 					.text("Temperature and Percipitation in Bern: 1864 - 2018")
