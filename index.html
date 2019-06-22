@@ -57,41 +57,80 @@
 											"Precipitation": prec})
 			})
 			//console.log(reduced)
-			var step = w / reduced.length
-			var yScale = d3.scaleLinear().domain([0, d3.max(reduced, d => d.Precipitation)]).range([0, h])
-			//var colorScale = d3.scaleLinear()
-			//	.domain(d3.extent(reduced, d => d.Temperature)).range([1.3,-0.3])
-			var colorScale = d3.scaleSequential([d3.max(reduced, d => d.Temperature)-1, d3.min(reduced, d => d.Temperature)+1] , d3.interpolateRdBu)
-			svg.selectAll("rect.klima")
-				.data(reduced)
-				.enter().append("rect")
-				.attr("class", "klima")
-				.attr("width", step)
-				.attr("height", d => yScale(d.Precipitation))
-				.attr("x", (d,i) => i * step)
-				.attr("y", d => h - yScale(d.Precipitation))
-				.style("fill", d => colorScale(d.Temperature))
-				//.style("fill", d => d3.interpolateRdBu(colorScale(d.Temperature)))
-				.append("title")
-          .text(d => d.Year)
-			svg.append("rect")
-				.attr("y", h - 70)
-				.attr("height", 70)
-				.attr("width", w)
-				.style("opacity", .25)
-				.style("fill", "#ffffff")
-			svg.append("text")
-				.text("Temperature and Percipitation in Bern: 1864 - 2018")
-				.attr("y", h - 10)
-				.attr("x", 10)
-				.attr("font-family", "sans-serif")
-        .attr("font-size", d => {
-					if (w > 1850) return "70px"
-					else if (w > 1350) return "50px"
-					else if (w > 800) return "30px"
-					else if (w > 0) return "15px"
-				})
-				.style("fill", "#333333")
+			console.log(h > w)
+			if (+h > +w){
+				var step = h / reduced.length
+				var yScale = d3.scaleLinear().domain([0, d3.max(reduced, d => d.Precipitation)]).range([0, w])
+				//var colorScale = d3.scaleLinear()
+				//	.domain(d3.extent(reduced, d => d.Temperature)).range([1.3,-0.3])
+				var colorScale = d3.scaleSequential([d3.max(reduced, d => d.Temperature)-1, d3.min(reduced, d => d.Temperature)+1] , d3.interpolateRdBu)
+				svg.selectAll("rect.klima")
+					.data(reduced)
+					.enter().append("rect")
+					.attr("class", "klima")
+					.attr("height", step)
+					.attr("width", d => yScale(d.Precipitation))
+					.attr("y", (d,i) => i * step)
+					
+					.style("fill", d => colorScale(d.Temperature))
+					//.style("fill", d => d3.interpolateRdBu(colorScale(d.Temperature)))
+					.append("title")
+	          .text(d => d.Year)
+				svg.append("rect")
+					.attr("height", h)
+					.attr("width", 45)
+					.style("opacity", .4)
+					.style("fill", "#ffffff")
+				svg.append("text")
+					.text("Temperature and Percipitation in Bern: 1864 - 2018")
+					.attr("y", -10)
+					.attr("x", 10)
+					.attr("transform", "rotate(90)")
+					.attr("font-family", "sans-serif")
+	        .attr("font-size", d => {
+						if (h > 900) return "30px"
+						else if (h > 600) return "20px"
+						else return "15px"
+					})
+					.style("fill", "#333333")
+			} else {
+				var step = w / reduced.length
+				var yScale = d3.scaleLinear().domain([0, d3.max(reduced, d => d.Precipitation)]).range([0, h])
+				//var colorScale = d3.scaleLinear()
+				//	.domain(d3.extent(reduced, d => d.Temperature)).range([1.3,-0.3])
+				var colorScale = d3.scaleSequential([d3.max(reduced, d => d.Temperature)-1, d3.min(reduced, d => d.Temperature)+1] , d3.interpolateRdBu)
+				svg.selectAll("rect.klima")
+					.data(reduced)
+					.enter().append("rect")
+					.attr("class", "klima")
+					.attr("width", step)
+					.attr("height", d => yScale(d.Precipitation))
+					.attr("x", (d,i) => i * step)
+					.attr("y", d => h - yScale(d.Precipitation))
+					.style("fill", d => colorScale(d.Temperature))
+					//.style("fill", d => d3.interpolateRdBu(colorScale(d.Temperature)))
+					.append("title")
+	          .text(d => d.Year)
+				svg.append("rect")
+					.attr("y", h - 70)
+					.attr("height", 70)
+					.attr("width", w)
+					.style("opacity", .25)
+					.style("fill", "#ffffff")
+				svg.append("text")
+					.text("Temperature and Percipitation in Bern: 1864 - 2018")
+					.attr("y", h - 10)
+					.attr("x", 10)
+					.attr("font-family", "sans-serif")
+	        .attr("font-size", d => {
+						if (w > 1850) return "70px"
+						else if (w > 1350) return "50px"
+						else if (w > 800) return "30px"
+						else return "15px"
+					})
+					.style("fill", "#333333")
+			}
+			
 			
 		})						
 		
